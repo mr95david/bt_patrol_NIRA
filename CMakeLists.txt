@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(test_cpp)
+project(hcs_bt_pkg)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -8,100 +8,61 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_action REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(hcs_ollama_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(nav2_behavior_tree REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-
+# Inclusion de paquetes de encabezados
 include_directories(include)
-# Seccion de creacion de ejecutables de nodos
-add_executable(vlm_client src/vlm_client.cpp)
-target_include_directories(vlm_client PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(vlm_client PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(
-  vlm_client
-  "rclcpp"
-  "rclcpp_action"
-  "sensor_msgs"
-  "hcs_ollama_msgs"
-)
 
-add_executable(vlm_client_once src/vlm_client_once.cpp)
-target_include_directories(vlm_client_once PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(vlm_client_once PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(
-  vlm_client_once
-  "rclcpp"
-  "rclcpp_action"
-  "sensor_msgs"
-  "hcs_ollama_msgs"
-)
+# Seccion de configuracion de nodos y ejecutables
+add_executable(simple_publisher src/simple_publisher.cpp)
+ament_target_dependencies(simple_publisher rclcpp std_msgs std_srvs)
 
-add_executable(vlm_client_onh src/vlm_client_onh.cpp)
-ament_target_dependencies(vlm_client_onh
-  "rclcpp"
-  "rclcpp_action"
-  "sensor_msgs"
-  "hcs_ollama_msgs"
-)
-
-add_executable(main_bt
-  src/main_bt.cpp
-  src/bt_nodes_registration.cpp
-)
+# Ejecutable main
+add_executable(main_bt src/main_bt.cpp)
 # Vincula las dependencias necesarias al ejecutable
 ament_target_dependencies(main_bt
   rclcpp
-  rclcpp_action
-  sensor_msgs
-  hcs_ollama_msgs
   behaviortree_cpp_v3
   ament_index_cpp
 )
-target_link_libraries(main_bt
-  bt_action_vlm
-)
+target_link_libraries(main_bt check_plugin always_running)
 
-# agregar plugin de bt
-add_library(bt_action_vlm SHARED
-  src/bt_action_vlm.cpp
-)
-ament_target_dependencies(bt_action_vlm
-  rclcpp
-  rclcpp_action
-  sensor_msgs
-  hcs_ollama_msgs
-  behaviortree_cpp_v3
-)
+# Seccion de creacion de ejecutor de plugin
+# Plugin de chequeo de estatus
+add_library(check_plugin SHARED src/check_plugin.cpp)
+ament_export_libraries(check_plugin)
+ament_target_dependencies(check_plugin rclcpp std_msgs behaviortree_cpp_v3)
+# Plugin para continua ejecucion
+add_library(always_running SHARED src/always_running.cpp)
+ament_export_libraries(always_running)
+ament_target_dependencies(always_running rclcpp behaviortree_cpp_v3)
 
-install(TARGETS 
-  vlm_client
-  vlm_client_once
-  vlm_client_onh
-  main_bt
-  DESTINATION lib/${PROJECT_NAME})
-
-# Instalacion como libreria
+# Instalacion de los plugins como librerias
 install(
-  TARGETS bt_action_vlm main_bt
+  TARGETS check_plugin always_running main_bt
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
-install(
-  FILES config/bt_tree.xml
-  DESTINATION share/${PROJECT_NAME}/config
+# Configuracion de ejecutables de nodo
+install(TARGETS simple_publisher main_bt
+  DESTINATION lib/${PROJECT_NAME}
 )
 
+# Orden de instalacion de paquetes "include"
 install(
   DIRECTORY include/
   DESTINATION include/
+)
+
+# Instalacion de carpetas complementarias
+install(
+  DIRECTORY config launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

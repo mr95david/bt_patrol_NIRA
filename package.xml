@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>test_cpp</name>
+  <name>hcs_bt_pkg</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="eliotrianar95@gmail.com">hcs</maintainer>
+  <maintainer email="eliotrianar95@gmail.com">elio</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -12,11 +12,12 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
   <depend>sensor_msgs</depend>
-  <depend>hcs_ollama_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>nav2_behavior_tree</depend>
   <depend>behaviortree_cpp_v3</depend>
+  <depend>hcs_ollama_msgs</depend>
   <depend>ament_index_cpp</depend>
-
-  <!-- <exec_depend>behaviortree_cpp_v3</exec_depend> -->
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
