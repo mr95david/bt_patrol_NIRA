@@ -1,0 +1,12 @@
+<root main_tree_to_execute="MainTree">
+  <!-- Arbol de comportamiento de ejecucion continua -->
+  <BehaviorTree ID="MainTree">
+    <!-- Reactive fallback que ejecuta continuamente el ciclo -->
+    <ReactiveFallback name="root_fallback">
+        <!-- Ejecucion de etiqueta de validador -->
+        <CheckValCondition topic_name="/validation"/>
+        <!-- Ejecucion de etiqueta de ejecucion continua -->
+        <AlwaysRunning name="running_state"/>
+    </ReactiveFallback>
+  </BehaviorTree>
+</root>
