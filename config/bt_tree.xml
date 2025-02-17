@@ -1,0 +1,10 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Sequence name="main_sequence">
+    <GetVlmResponse prompt="what objects can see, do a list for me." validate_stream="true" response="{response}" />
+      <!-- <GetVlmResponse prompt="what objects can see, do a list for me." validate_stream="true">
+        <output port="response" />
+      </GetVlmResponse> -->
+    </Sequence>
+  </BehaviorTree>
+</root>
