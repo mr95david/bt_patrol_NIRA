@@ -30,6 +30,18 @@ ament_target_dependencies(main_bt
 )
 target_link_libraries(main_bt check_plugin always_running)
 
+# configuracion de segundo main - Behavior tree general integrando uso de plugins propios y plugins de nav2
+add_executable(main_bt_nav_ntegration src/main_bt_nav_ntegration.cpp)
+# Vincula las dependencias necesarias al ejecutable
+ament_target_dependencies(main_bt_nav_ntegration
+  rclcpp
+  behaviortree_cpp_v3
+  ament_index_cpp
+  nav2_behavior_tree
+)
+target_link_libraries(main_bt_nav_ntegration check_plugin always_running)
+
+
 # Seccion de creacion de ejecutor de plugin
 # Plugin de chequeo de estatus
 add_library(check_plugin SHARED src/check_plugin.cpp)
@@ -42,14 +54,14 @@ ament_target_dependencies(always_running rclcpp behaviortree_cpp_v3)
 
 # Instalacion de los plugins como librerias
 install(
-  TARGETS check_plugin always_running main_bt
+  TARGETS check_plugin always_running main_bt  #main_bt_nav_ntegration
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
 # Configuracion de ejecutables de nodo
-install(TARGETS simple_publisher main_bt
+install(TARGETS simple_publisher main_bt main_bt_nav_ntegration
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -61,7 +73,7 @@ install(
 
 # Instalacion de carpetas complementarias
 install(
-  DIRECTORY config launch
+  DIRECTORY config launch params
   DESTINATION share/${PROJECT_NAME}
 )
 
