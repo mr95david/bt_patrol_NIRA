@@ -1,12 +1,32 @@
 <root main_tree_to_execute="MainTree">
   <!-- Arbol de comportamiento de ejecucion continua -->
   <BehaviorTree ID="MainTree">
+    <Repeat num_cycles="10" name="loop_patrol">
+        <Sequence name="patrol_sequence">
+
+
+          <Sequence name="go_to_point_a">
+            <CreateGoalPose x="1.8" y="0.4" theta="0.0" goal_pose="{goal_pose_a}"/>
+            <NavigateToPoseNode name="navigate_to_a" goal_pose="{goal_pose_a}"/>
+          </Sequence>
+
+          <Sequence name="go_to_point_b">
+            <CreateGoalPose x="-1.9" y="-0.6" theta="0.0" goal_pose="{goal_pose_b}"/>
+            <NavigateToPoseNode name="navigate_to_b" goal_pose="{goal_pose_b}"/>
+          </Sequence>
+
+        </Sequence>
+      </Repeat>
+    <!-- <Sequence>
+      <CreateGoalPose x="-1.0" y="-1.0" theta="1.57" goal_pose="{goal_pose}"/>
+      <NavigateToPoseNode name="navigate" goal_pose="{goal_pose}"/>
+    </Sequence> -->
     <!-- Reactive fallback que ejecuta continuamente el ciclo -->
-    <ReactiveFallback name="root_fallback">
+    <!-- <ReactiveFallback name="root_fallback"> -->
         <!-- Ejecucion de etiqueta de validador -->
-        <CheckValCondition topic_name="/validation"/>
+        <!-- <CheckValCondition topic_name="/validation"/> -->
         <!-- Ejecucion de etiqueta de ejecucion continua -->
-        <AlwaysRunning name="running_state"/>
-    </ReactiveFallback>
+        <!-- <AlwaysRunning name="running_state"/> -->
+    <!-- </ReactiveFallback> -->
   </BehaviorTree>
 </root>
