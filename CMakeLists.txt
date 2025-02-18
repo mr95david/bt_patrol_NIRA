@@ -10,9 +10,12 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(nav2_behavior_tree REQUIRED)
 find_package(ament_index_cpp REQUIRED)
+find_package(tf2 REQUIRED)
 # Inclusion de paquetes de encabezados
 include_directories(include)
 
@@ -39,7 +42,7 @@ ament_target_dependencies(main_bt_nav_ntegration
   ament_index_cpp
   nav2_behavior_tree
 )
-target_link_libraries(main_bt_nav_ntegration check_plugin always_running)
+target_link_libraries(main_bt_nav_ntegration check_plugin always_running nav_to_pose_plugin goal_create_plugin)
 
 
 # Seccion de creacion de ejecutor de plugin
@@ -51,10 +54,18 @@ ament_target_dependencies(check_plugin rclcpp std_msgs behaviortree_cpp_v3)
 add_library(always_running SHARED src/always_running.cpp)
 ament_export_libraries(always_running)
 ament_target_dependencies(always_running rclcpp behaviortree_cpp_v3)
+# Plugin para activacion de navegacion
+add_library(nav_to_pose_plugin SHARED src/nav_to_pose_plugin.cpp)
+ament_export_libraries(nav_to_pose_plugin)
+ament_target_dependencies(nav_to_pose_plugin rclcpp rclcpp_action behaviortree_cpp_v3 geometry_msgs nav2_msgs)
+# Creador de objetivo
+add_library(goal_create_plugin SHARED src/goal_create_plugin.cpp)
+ament_export_libraries(goal_create_plugin)
+ament_target_dependencies(goal_create_plugin rclcpp behaviortree_cpp_v3 geometry_msgs tf2)
 
 # Instalacion de los plugins como librerias
 install(
-  TARGETS check_plugin always_running main_bt  #main_bt_nav_ntegration
+  TARGETS check_plugin always_running nav_to_pose_plugin goal_create_plugin main_bt main_bt_nav_ntegration
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
