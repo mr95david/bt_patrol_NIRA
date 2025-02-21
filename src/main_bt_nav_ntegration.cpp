@@ -38,39 +38,36 @@ int main(int argc, char ** argv)
 
     // Inscripcion de arbol de comportamiento
     std::string package_share_dir = ament_index_cpp::get_package_share_directory("hcs_bt_pkg");
-    std::string bt_xml_file = package_share_dir + "/config/second_bt.xml";
+    std::string bt_xml_file = package_share_dir + "/config/third_bt.xml";
     auto tree = factory.createTreeFromFile(bt_xml_file);
 
     // Nodo Dummy para procesar callbacks de ROS2
     auto node = rclcpp::Node::make_shared("dummy_node2");
 
     BT::NodeStatus status = BT::NodeStatus::RUNNING;
-    while (rclcpp::ok() && status == BT::NodeStatus::RUNNING)
+    // while (rclcpp::ok() && status == BT::NodeStatus::RUNNING)
+    while (rclcpp::ok())
     {
         // Tick del árbol
         status = tree.tickRoot();
 
         // Procesamos callbacks del dummy_node2 (si es que hace algo)
-        rclcpp::spin_some(node);
+        // Iterate through all nodes
+        for (const auto& node : tree.nodes)
+        {
+            std::cout << "Node [" << node->name() << "] status: "
+                      << toStr(node->status()) << std::endl;
+        }
 
+        if (status != BT::NodeStatus::RUNNING)
+        {
+            std::cout << "BT execution ended with status: " << BT::toStr(status) << std::endl;
+            tree.rootNode()->halt();
+        }
+
+        rclcpp::spin_some(node);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
-    // while (status == BT::NodeStatus::RUNNING)
-    // while (rclcpp::ok())
-    // {
-    //     BT::NodeStatus status = tree.tickRoot();
-
-    //     rclcpp::spin_some(node);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-    //     if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE)
-    //     {
-    //         RCLCPP_INFO(node->get_logger(), "BT Finalizado. Reiniciando...");
-    //         status = BT::NodeStatus::RUNNING;
-    //     }
-
-    // }
 
     // Finalizar ROS2
     rclcpp::shutdown();

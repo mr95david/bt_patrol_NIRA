@@ -39,6 +39,8 @@ namespace nav_to_pose_plugin
             BT::NodeStatus onStart() override;
             BT::NodeStatus onRunning() override;
             void onHalted() override;
+            void onHalt();
+            
         // Scope privado de funciones y variables de nodo
         private:
             rclcpp::Node::SharedPtr node_;

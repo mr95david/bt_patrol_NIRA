@@ -1,0 +1,27 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+  <!-- <RetryUntilSuccessful name="retry_node" num_attempts="3"> -->
+    <!-- <Repeat num_cycles="-1" name="general_loop"> -->
+        <ReactiveFallback name="monitor_validation">
+            <Sequence name="validation_sequence">
+                <CheckValCondition topic_name="/validation" />
+                <CreateGoalPose x="0.7" y="1.93" theta="0.0" goal_pose="{validation_goal}"/>
+                <NavigateToPoseNode name="navigate_to_validation" goal_pose="{validation_goal}" />
+            </Sequence>
+            <Repeat num_cycles="-1" name="loop_patrol">
+                <Sequence name="patrol_sequence">
+                    <Sequence name="go_to_point_a">
+                        <CreateGoalPose x="1.8" y="0.4" theta="0.0" goal_pose="{goal_pose_a}"/>
+                        <NavigateToPoseNode name="navigate_to_a" goal_pose="{goal_pose_a}"/>
+                    </Sequence>
+                    <Sequence name="go_to_point_b">
+                        <CreateGoalPose x="-1.9" y="-0.6" theta="0.0" goal_pose="{goal_pose_b}"/>
+                        <NavigateToPoseNode name="navigate_to_b" goal_pose="{goal_pose_b}"/>
+                    </Sequence>
+                </Sequence>
+            </Repeat>
+        </ReactiveFallback>
+    <!-- </Repeat> -->
+    <!-- </RetryUntilSuccessful> -->
+  </BehaviorTree>
+</root>
