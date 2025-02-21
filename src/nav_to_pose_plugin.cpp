@@ -32,6 +32,7 @@ namespace nav_to_pose_plugin
 
     NavigateToPoseNode::~NavigateToPoseNode()
     {
+
         if (executor_) {
             executor_->cancel();
         }
@@ -43,7 +44,7 @@ namespace nav_to_pose_plugin
     // Estado de inicio de ejecucion de nodo
     BT::NodeStatus NavigateToPoseNode::onStart()
     {
-        
+        RCLCPP_WARN(node_->get_logger(), "Nodo iniciado");
         // Variables de definicio  de objetivo
         geometry_msgs::msg::PoseStamped goal_pose;
         if (!getInput("goal_pose", goal_pose))
@@ -64,10 +65,11 @@ namespace nav_to_pose_plugin
             }
             else
             {
+                RCLCPP_ERROR(node_->get_logger(), "Error en la ejecucion del callback");
                 setStatus(BT::NodeStatus::FAILURE);
             }
         };
-        RCLCPP_ERROR(node_->get_logger(), "Envio en start ejecutado correctamente.");
+        // RCLCPP_ERROR(node_->get_logger(), "Envio en start ejecutado correctamente.");
         goal_future_ = action_client_->async_send_goal(goal_msg, send_goal_options);
         goal_sent_ = true;
         return BT::NodeStatus::RUNNING;
@@ -77,8 +79,11 @@ namespace nav_to_pose_plugin
 
     BT::NodeStatus NavigateToPoseNode::onRunning()
     {
+        RCLCPP_WARN(node_->get_logger(), "Nodo Corriendo");
+        // RCLCPP_WARN(node_->get_logger(), "Puto nodo");
         if (!goal_sent_)
         {
+            RCLCPP_ERROR(node_->get_logger(), "Error de envio de objetivo");
             return BT::NodeStatus::FAILURE;
         }
 
@@ -88,7 +93,7 @@ namespace nav_to_pose_plugin
             RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by the server.");
             return BT::NodeStatus::FAILURE;
         }
-        RCLCPP_ERROR(node_->get_logger(), "Envio en running ejecutado correctamente.");
+        // RCLCPP_ERROR(node_->get_logger(), "Envio en running ejecutado correctamente.");
         auto result_future = action_client_->async_get_result(goal_handle);
         if (result_future.wait_for(std::chrono::milliseconds(100)) == std::future_status::ready)
         {
@@ -110,8 +115,10 @@ namespace nav_to_pose_plugin
             {
                 action_client_->async_cancel_goal(goal_handle);
                 RCLCPP_INFO(node_->get_logger(), "NavigateToPose goal canceled.");
+                goal_sent_ = false;
+                setStatus(BT::NodeStatus::IDLE);
             }
-        }
+        }   
     }
 }
 
